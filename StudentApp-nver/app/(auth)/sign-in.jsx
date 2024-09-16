@@ -1,21 +1,38 @@
 import React, { useState } from 'react';
 import { GestureHandlerRootView, TouchableOpacity } from 'react-native-gesture-handler';
-import { View, Text, StyleSheet, Image, ImageBackground, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Image, ImageBackground, KeyboardAvoidingView, Platform, ScrollView, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { images } from '../../constants';
 import CustomButton from '../../components/CustomButton';
 import FormField from '../../components/FormField';
 import { Link } from 'expo-router';
+import { signIn } from '../../lib/appwrite';
+import { router } from 'expo-router';
 
 const SignIn = ({ navigation }) => {
   const [form, setForm] = useState({
-    registerNumber: "",
-    password: "",
+    email: '',
+    password: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const submit = () => {
-    // Handle your submit logic here
+  const submit = async () => {
+    if (form.email === "" || form.password === "") {
+      Alert.alert("Error", "Please fill in all fields");
+      return; // Prevent submission if fields are empty
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      await signIn(form.email, form.password);
+      // Navigate to home on successful sign-in
+      router.replace('/home');
+    } catch (error) {
+      Alert.alert('Error', error.message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -42,13 +59,13 @@ const SignIn = ({ navigation }) => {
               <Text style={styles.welcomee}>Welcome</Text>
               <Text style={styles.instructions}>Enter your Register Number and Password:</Text>
 
-              {/* Register Number Input */}
+              {/* Email Input */}
               <FormField
                 style={styles.input}
-                title="Register Number"
-                placeholder="Register Number"
-                value={form.registerNumber}
-                onChangeText={(e) => setForm({ ...form, registerNumber: e })}
+                title="Email"
+                placeholder="Email"
+                value={form.email}
+                onChangeText={(e) => setForm({ ...form, email: e })}
               />
 
               {/* Password Input */}
@@ -62,10 +79,10 @@ const SignIn = ({ navigation }) => {
 
               {/* Forgot Password */}
               <Link 
-              href="/forgot"
-              style={styles.row}>
-              <Text style={styles.forgotPassword}>Forgot Password?</Text>
-            </Link>
+                href="/forgot"
+                style={styles.row}>
+                <Text style={styles.forgotPassword}>Forgot Password?</Text>
+              </Link>
 
               {/* Log In Button */}
               <CustomButton
@@ -85,7 +102,7 @@ const SignIn = ({ navigation }) => {
 
 export default SignIn;
 
-// Styles from App.js
+// Styles
 const styles = StyleSheet.create({
   background: {
     flex: 1,
@@ -96,25 +113,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     paddingTop: 60,
-    justifyContent: 'center', 
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'right',
-    alignItems: 'center',
-    marginBottom: 40,
-  },
-  universityText: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  universityTextSmall: {
-    fontSize: 14,
-  },
-  logo: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    justifyContent: 'center',
   },
   welcome: {
     fontSize: 70,

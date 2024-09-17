@@ -1,156 +1,177 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ImageBackground } from 'react-native';
+import React from 'react';
+import { Image, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { createDrawerNavigator } from '@react-navigation/drawer';
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-import Forgot from './forgot';  // Import the Forgot.js file
+import HomePage from './homepage';
+import Announcement from './announcement';
+import Settings from './Settings'; // Import the Settings screen
+import { ThemeProvider, useTheme } from './ThemeContext'; // Import the theme context
 
-// HomeScreen Component
-function HomeScreen({ navigation }) {
-  const [registerNumber, setRegisterNumber] = useState('');
-  const [password, setPassword] = useState('');
+const Drawer = createDrawerNavigator();
+
+// Custom drawer content component
+function CustomDrawerContent(props) {
+  const { isDarkMode } = useTheme(); // Get the current theme state
+
+  const themeStyles = isDarkMode ? darkStyles : lightStyles; // Select theme styles
 
   return (
-    <ImageBackground source={require('./assets/bg.jpeg')} style={styles.background}>
-      <View style={styles.container}>
-        {/* Header */}
-        <View style={styles.header}>
-        <View style={styles.headerText}>
-            <Text style={styles.universityText}>CHRIST</Text>
-            <Text style={styles.universityTextSmall}>University</Text>
-          </View>
-          <Image source={require('./assets/emblem.png')} style={styles.logo} />
-        </View>
+    <View style={[styles.drawerContent, themeStyles.drawerContent]}>
+      <Text style={[styles.drawerTitle, themeStyles.drawerTitle]}>Menu</Text>
 
-        {/* Welcome Message */}
-        <Text style={styles.welcome}>Hi !</Text>
-        <Text style={styles.welcomee}>Welcome</Text>
-        <Text style={styles.instructions}>Enter your Register Number and Password:</Text>
+      <TouchableOpacity
+        style={[styles.drawerItem, themeStyles.drawerItem]}
+        onPress={() => props.navigation.navigate('HomePage')}
+      >
+        <Text style={[styles.drawerItemText, themeStyles.drawerItemText]}>Home</Text>
+      </TouchableOpacity>
 
-        {/* Register Number Input */}
-        <TextInput
-          style={styles.input}
-          placeholder="Register Number"
-          value={registerNumber}
-          onChangeText={setRegisterNumber}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
-        />
+      <TouchableOpacity
+        style={[styles.drawerItem, themeStyles.drawerItem]}
+        onPress={() => props.navigation.navigate('Announcements')}
+      >
+        <Text style={[styles.drawerItemText, themeStyles.drawerItemText]}>Announcements</Text>
+      </TouchableOpacity>
 
-        {/* Forgot Password */}
-        <View style={styles.row}>
-          <TouchableOpacity onPress={() => navigation.navigate('Forgot')}>
-            <Text style={styles.forgotPassword}>Forgot Password?</Text>
-          </TouchableOpacity>
-        </View>
+      <TouchableOpacity
+        style={[styles.drawerItem, themeStyles.drawerItem]}
+        onPress={() => props.navigation.navigate('Calendar')}
+      >
+        <Text style={[styles.drawerItemText, themeStyles.drawerItemText]}>My Calendar</Text>
+      </TouchableOpacity>
 
-        {/* Log In Button */}
-        <TouchableOpacity style={styles.button} onPress={() => alert('Logging in')}>
-          <Text style={styles.buttonText}>Log In</Text>
-        </TouchableOpacity>
-      </View>
-    </ImageBackground>
+      <TouchableOpacity
+        style={[styles.drawerItem, themeStyles.drawerItem]}
+        onPress={() => props.navigation.navigate('Assignments')}
+      >
+        <Text style={[styles.drawerItemText, themeStyles.drawerItemText]}>Assignments</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={[styles.drawerItem, themeStyles.drawerItem]}
+        onPress={() => props.navigation.navigate('Exams')}
+      >
+        <Text style={[styles.drawerItemText, themeStyles.drawerItemText]}>Exams</Text>
+      </TouchableOpacity>
+
+      {/* Settings Option */}
+      <TouchableOpacity
+        style={[styles.drawerItem, themeStyles.drawerItem]}
+        onPress={() => props.navigation.navigate('Settings')}
+      >
+        <Text style={[styles.drawerItemText, themeStyles.drawerItemText]}>Settings</Text>
+      </TouchableOpacity>
+    </View>
   );
 }
 
-// Set up the Stack Navigator
-const Stack = createStackNavigator();
+function AppNavigator() {
+  const { isDarkMode } = useTheme(); // Access current theme
+  const themeStyles = isDarkMode ? darkHeaderStyles : lightHeaderStyles;
 
+  return (
+    <Drawer.Navigator drawerContent={(props) => <CustomDrawerContent {...props} />}>
+      <Drawer.Screen
+        name="HomePage"
+        component={HomePage}
+        options={{
+          title: '',
+          headerTitle: () => (
+            <Image
+              source={require('./assets/emblemm.png')}
+              style={{ width: 40, height: 40, resizeMode: 'contain' }}
+            />
+          ),
+          headerTitleAlign: 'center',
+          headerStyle: themeStyles.headerStyle,
+          headerTintColor: themeStyles.headerTintColor,
+        }}
+      />
+      <Drawer.Screen
+        name="Announcements"
+        component={Announcement}
+        options={{
+          headerTitle: 'Announcements',
+          headerStyle: themeStyles.headerStyle,
+          headerTintColor: themeStyles.headerTintColor,
+        }}
+      />
+      <Drawer.Screen
+        name="Settings"
+        component={Settings}
+        options={{
+          headerTitle: 'Settings',
+          headerStyle: themeStyles.headerStyle,
+          headerTintColor: themeStyles.headerTintColor,
+        }}
+      />
+    </Drawer.Navigator>
+  );
+}
+
+// Main App Component with Theme Provider
 export default function App() {
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Home">
-        <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
-        <Stack.Screen name="Forgot" component={Forgot} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <ThemeProvider>
+      <NavigationContainer>
+        <AppNavigator />
+      </NavigationContainer>
+    </ThemeProvider>
   );
 }
 
-// Styles (updated to align logo and text to the right)
+// Base styles for drawer
 const styles = StyleSheet.create({
-  background: {
-    flex: 1,
-    width: '100%',
-    height: '100%',
-  },
-  container: {
+  drawerContent: {
     flex: 1,
     padding: 20,
   },
-  header: {
-    flexDirection: 'row',  // Align items horizontally
-    justifyContent: 'right',  // Push text to left and logo to right
-    alignItems: 'center',  // Vertically align the logo and text
-    marginBottom: 40,
-  },
-  headerText: {
-    flexDirection: 'column',
-    justifyContent: 'center',
-  },
-  universityText: {
+  drawerTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-  },
-  universityTextSmall: {
-    fontSize: 14,
-  },
-  logo: {
-    width: 80,
-    height: 80,
-    borderRadius: 40, 
-  },
-  welcome: {
-    fontSize: 70,
-    fontWeight: 'bold',
-    paddingTop: 70,
-    color: '#dcecfc',
-  },
-  welcomee: {
-    fontSize: 60,
-    fontWeight: 'bold',
-    marginBottom: 5,
-    color: '#1C2E4A',
-  },
-  instructions: {
-    textAlign: 'left',
-    fontSize: 14,
-    color: '#000000',
-    marginBottom: 30,
-  },
-  input: {
-    height: 40,
-    borderColor: '#1C2E4A',
-    borderWidth: 1,
-    borderRadius: 5,
-    marginBottom: 20,
-    paddingHorizontal: 10,
-    fontSize: 16,
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
     marginBottom: 20,
   },
-  forgotPassword: {
-    fontSize: 14,
-    color: '#000000',
-    alignSelf: 'flex-end',
+  drawerItem: {
+    paddingVertical: 15,
   },
-  button: {
-    backgroundColor: '#1C2E4A',
-    paddingVertical: 10,
-    borderRadius: 5,
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: '#fff',
+  drawerItemText: {
     fontSize: 16,
-    fontWeight: 'bold',
   },
 });
+
+// Light mode styles
+const lightStyles = StyleSheet.create({
+  drawerContent: {
+    backgroundColor: '#fff',
+  },
+  drawerTitle: {
+    color: '#333',
+  },
+  drawerItemText: {
+    color: '#333',
+  },
+});
+
+// Dark mode styles
+const darkStyles = StyleSheet.create({
+  drawerContent: {
+    backgroundColor: '#333',
+  },
+  drawerTitle: {
+    color: '#fff',
+  },
+  drawerItemText: {
+    color: '#fff',
+  },
+});
+
+// Light and dark mode header styles
+const lightHeaderStyles = {
+  headerStyle: { backgroundColor: '#1b4769' },
+  headerTintColor: '#dcecfc',
+};
+
+const darkHeaderStyles = {
+  headerStyle: { backgroundColor: '#000' },
+  headerTintColor: '#fff',
+};

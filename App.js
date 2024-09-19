@@ -7,6 +7,7 @@ import Announcement from './announcement';
 import Settings from './Settings'; // Import the Settings screen
 import { ThemeProvider, useTheme } from './ThemeContext'; // Import the theme context
 
+
 const Drawer = createDrawerNavigator();
 
 // Custom drawer content component

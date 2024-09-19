@@ -1,7 +1,4 @@
-import { ActivityIndicator, Text, TouchableOpacity, StyleSheet  } from "react-native";
-import tailwindConfig from "../tailwind.config";
-
-const { colors } = tailwindConfig.theme.extend;
+import { ActivityIndicator, Text, TouchableOpacity, StyleSheet } from "react-native";
 
 const CustomButton = ({
   title,
@@ -14,13 +11,11 @@ const CustomButton = ({
     <TouchableOpacity
       onPress={handlePress}
       activeOpacity={0.7}
-      className={`bg-blackPantone rounded-xl min-h-[50px] flex flex-row justify-center items-center ${containerStyles} ${
-        isLoading ? "opacity-50" : ""
-      }`}
       disabled={isLoading}
       style={[
         styles.defaultButton, // Default button styles
         containerStyles, // Override container styles from props
+        isLoading && styles.disabledButton, // Apply opacity when loading
       ]}
     >
       <Text
@@ -33,20 +28,17 @@ const CustomButton = ({
       </Text>
 
       {isLoading && (
-        <ActivityIndicator
-          animating={isLoading}
-          color="#fff"
-          size="small"
-        />
+        <ActivityIndicator animating={isLoading} color="#fff" size="small" />
       )}
     </TouchableOpacity>
   );
 };
 
+// Define the styles with StyleSheet, directly embedding the color values
 const styles = StyleSheet.create({
   defaultButton: {
-    backgroundColor: colors.blackPantone,
-    borderColor: colors.grayDark,
+    backgroundColor: '#201E1E', // blackPantone
+    borderColor: '#4A4A4A', // grayDark
     borderWidth: 1,
     borderRadius: 10,
     minHeight: 50,
@@ -54,7 +46,10 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     justifyContent: "center",
     alignItems: "center",
-    
+    flexDirection: "row", // Replace flex-row from Tailwind
+  },
+  disabledButton: {
+    opacity: 0.5, // Replace Tailwind's opacity-50 when loading
   },
   defaultButtonText: {
     color: "#fff",

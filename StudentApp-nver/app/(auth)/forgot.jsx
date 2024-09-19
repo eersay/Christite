@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, ActivityIndicator, Image, ImageBackground } from 'react-native';
 import CustomButton from '../../components/CustomButton';  // Assuming you have a CustomButton component
 import { handleForgotPassword } from '../../lib/appwrite';  // Import the function from appwrite.jsx
+import { images } from '../../constants';
+
 
 const ForgetPassword = () => {
   const [email, setEmail] = useState('');
@@ -27,60 +29,86 @@ const ForgetPassword = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Forgot Password</Text>
-      <Text style={styles.instructions}>
-        Enter your email address, and we will send you a password reset link.
-      </Text>
+    <ImageBackground source={images.signinbg1} style={styles.background}>
+      <View style={styles.container}>
+        {/* Header */}
+        <View style={styles.header}>
+        <Image
+          source={images.emblem}
+          resizeMode='contain'
+          style={styles.logo}
+        />
+        </View>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Enter your email"
-        value={email}
-        onChangeText={(text) => setEmail(text)}
-        keyboardType="email-address"
-        autoCapitalize="none"
-        autoCorrect={false}
-      />
+        <Text style={styles.welcome}>Forgot Password</Text>
+        <Text style={styles.instructions}>
+          Enter your email address, and we will send you a password reset link.
+        </Text>
 
-      <CustomButton
-        title="Send Reset Link"
-        handlePress={handleSubmit}
-        containerStyles={styles.button}
-        textStyle={styles.buttonText}
-        isLoading={isSubmitting}
-      />
+        <TextInput
+          style={styles.input}
+          placeholder="Enter your email"
+          value={email}
+          onChangeText={(text) => setEmail(text)}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          autoCorrect={false}
+        />
 
-      {isSubmitting && <ActivityIndicator size="large" color="#1C2E4A" />}
-    </View>
+        <CustomButton
+          title="Send Reset Link"
+          handlePress={handleSubmit}
+          containerStyles={styles.button}
+          textStyle={styles.buttonText}
+          isLoading={isSubmitting}
+        />
+
+        {isSubmitting && <ActivityIndicator size="large" color="#1C2E4A" />}
+      </View>
+    </ImageBackground>
   );
 };
 
 export default ForgetPassword;
 
 const styles = StyleSheet.create({
+  background: {
+    flex: 1,
+    resizeMode: 'cover',
+  },
   container: {
     flex: 1,
     padding: 20,
+    paddingTop: 40,
+    justifyContent: 'center',
+  },
+  header: {
+    flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
+    marginBottom: 40,
   },
-  title: {
-    fontSize: 30,
+  logo: {
+    width: 100,
+    height: 100,
+    borderRadius: 40,
+  },
+  welcome: {
+    fontSize: 40,
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: 20,
+    textAlign: 'left',
+    marginTop: 10,
     color: '#1C2E4A',
   },
   instructions: {
-    fontSize: 16,
-    color: '#1C2E4A',
-    textAlign: 'center',
-    marginBottom: 20,
+    textAlign: 'left',
+    fontSize: 14,
+    color: '#000000',
+    marginBottom: 30,
   },
   input: {
-    width: '100%',
-    height: 50,
+    height: 40,
     borderColor: '#1C2E4A',
     borderWidth: 1,
     borderRadius: 5,

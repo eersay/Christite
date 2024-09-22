@@ -6,8 +6,9 @@ import { images } from '../../constants';
 import CustomButton from '../../components/CustomButton';
 import FormField from '../../components/FormField';
 import { Link } from 'expo-router';
-import { signIn } from '../../lib/appwrite';
+import { getCurrentUser, signIn } from '../../lib/appwrite';
 import { router } from 'expo-router';
+import { useGlobalContext } from "../../context/GlobalProvider";
 
 const SignIn = ({ navigation }) => {
   const [form, setForm] = useState({
@@ -15,6 +16,9 @@ const SignIn = ({ navigation }) => {
     password: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Destructure setUser and setIsLoggedIn from the global context
+  const { setUser, setIsLoggedIn } = useGlobalContext();
 
   const submit = async () => {
     if (form.email === "" || form.password === "") {
@@ -26,7 +30,12 @@ const SignIn = ({ navigation }) => {
 
     try {
       await signIn(form.email, form.password);
-      // Navigate to home on successful sign-in
+      const result = await getCurrentUser();
+
+      // Use setUser and setIsLoggedIn here
+      setUser(result);
+      setIsLoggedIn(true);
+      
       router.replace('/home');
     } catch (error) {
       Alert.alert('Error', error.message);
@@ -101,6 +110,7 @@ const SignIn = ({ navigation }) => {
 };
 
 export default SignIn;
+
 
 // Styles
 const styles = StyleSheet.create({

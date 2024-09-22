@@ -13,7 +13,7 @@ export default function Settings() {
     try {
       await logOut(); // Call the logOut function
       Alert.alert("Logged out", "You have been successfully logged out.");
-      router.replace('/'); // Navigate to the root `index.jsx` and clear navigation stack
+      router.replace('/sign-in'); // Navigate to the root `index.jsx` and clear navigation stack
     } catch (error) {
       Alert.alert("Logout failed", error.message);
     }

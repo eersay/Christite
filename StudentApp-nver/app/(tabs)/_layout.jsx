@@ -8,6 +8,7 @@ import Marks from './marks';
 import Profile from './profile';
 import Announcements from './announcements';
 import Settings from "./settings";
+import Timetable from "./timetable";
 import { ThemeProvider, useTheme } from '../../context/ThemeContext';
 
 // Define the colors manually
@@ -78,6 +79,7 @@ const DrawerLayout = () => {
         <Drawer.Screen name="home" component={Home} options={{ title: "Home" }} />
         <Drawer.Screen name="attendance" component={Attendance} options={{ title: "Attendance" }} />
         <Drawer.Screen name="marks" component={Marks} options={{ title: "Marks" }} />
+        <Drawer.Screen name="timetable" component={Timetable} options={{ title: "Timetable" }} />
         <Drawer.Screen name="profile" component={Profile} options={{ title: "Profile" }} />
         <Drawer.Screen name="announcements" component={Announcements} options={{ title: "Announcements" }} />
         <Drawer.Screen name="settings" component={Settings} options={{ title: "Settings" }} />

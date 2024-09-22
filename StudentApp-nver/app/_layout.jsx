@@ -4,6 +4,7 @@ import { useFonts } from 'expo-font';
 import { useEffect } from 'react';
 import { ThemeProvider } from '../context/ThemeContext';
 SplashScreen.preventAutoHideAsync();
+import GlobalProvider from '../context/GlobalProvider'
 
 const RootLayout = () => {
   const [fontsLoaded, error] =useFonts({
@@ -30,6 +31,7 @@ const RootLayout = () => {
   if(!fontsLoaded && !error) return null;
 
   return(
+    <GlobalProvider>
     <ThemeProvider>
     <Stack>
       <Stack.Screen 
@@ -58,6 +60,7 @@ const RootLayout = () => {
         /> */}
     </Stack>
     </ThemeProvider>
+    </GlobalProvider>
   )
 }
 

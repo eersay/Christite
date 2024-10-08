@@ -25,24 +25,29 @@ const SignIn = ({ navigation }) => {
       Alert.alert("Error", "Please fill in all fields");
       return; // Prevent submission if fields are empty
     }
-
+  
     setIsSubmitting(true);
-
+  
     try {
       await signIn(form.email, form.password);
       const result = await getCurrentUser();
-
-      // Use setUser and setIsLoggedIn here
+  
       setUser(result);
       setIsLoggedIn(true);
       
       router.replace('/home');
     } catch (error) {
-      Alert.alert('Error', error.message);
+      // Handle incorrect password case
+      if (error.message.includes("Invalid credentials")) {
+        Alert.alert("Incorrect Password", "The password you entered is incorrect. Please try again.");
+      } else {
+        Alert.alert('Error', error.message); // Handle other errors
+      }
     } finally {
       setIsSubmitting(false);
     }
   };
+  
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>

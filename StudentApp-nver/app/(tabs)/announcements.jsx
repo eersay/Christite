@@ -11,7 +11,7 @@ export default function Announcements() {
   const [isFullScreen, setIsFullScreen] = useState(false);
 
   // Access theme context
-  const { isDarkMode, themeColors } = useTheme(); 
+  const { isDarkMode, themeColors } = useTheme();  
 
   useEffect(() => {
     loadAnnouncements();

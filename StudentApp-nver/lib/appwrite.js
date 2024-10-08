@@ -2,6 +2,7 @@ import { Account, Avatars, Client, Databases, ID } from 'react-native-appwrite';
 import { Query } from 'react-native-appwrite';
 import { router } from 'expo-router';
 
+
 export const config={
   endpoint: 'https://cloud.appwrite.io/v1',
   platform: 'com.christite.studentapp',
@@ -12,7 +13,8 @@ export const config={
   announcementsCollectionID: 'announcements',
   settingsCollectionID:'settings',
   subjectCollectionID:'subjects',
-  attendanceCollectionID:'attendance'
+  attendanceCollectionID:'attendance',
+  courseCollectionID:'courses'
 };
 
 const client = new Client();
@@ -152,5 +154,50 @@ export const getAttendanceDistributionForStudent = async (registerNumber) => {
   } catch (error) {
     console.error('Error fetching attendance distribution:', error);
     throw new Error('Failed to fetch attendance distribution');
+  }
+};
+
+export const getCourseNameByCode = async (courseCode) => {
+  try {
+    // Make sure courseCode is available and valid
+    if (!courseCode) {
+      throw new Error('Invalid course code');
+    }
+
+    // Using Query.equal to find the document with the given courseCode
+    const query = [Query.equal('course_id', courseCode)]; // Make sure 'courseCode' is a valid field in the collection
+    const response = await database.listDocuments(
+      config.databaseID, 
+      config.courseCollectionID, 
+      query
+    );
+    
+    // Check if any documents were returned
+    if (response.documents.length > 0) {
+      // Assuming the document has a 'name' field representing the course name
+      return response.documents[0].name;
+    } else {
+      // No document found with the given courseCode
+      return null;
+    }
+  } catch (error) {
+    // Handle any errors that occur during the query
+    console.error('Error fetching course:', error);
+    return null; // Return null in case of an error
+  }
+};
+
+export const updatePhoneNumber = async (userId, newPhone) => {
+  try {
+    const updatedUser = await database.updateDocument(
+      config.databaseID,      // Replace with your Appwrite Database ID
+      config.studentCollectionID, // Replace with your Collection ID
+      userId,             // The document (user) ID
+      { phNo: newPhone }  // The new phone number field to update
+    );
+    return updatedUser;
+  } catch (error) {
+    console.error('Failed to update phone number:', error);
+    throw error;
   }
 };

@@ -1,29 +1,51 @@
-import React, { useState, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions, FlatList } from 'react-native';
-import { Ionicons } from '@expo/vector-icons'; // For icons
+import React, { useState, useEffect, useRef } from 'react';
+import { 
+  View, 
+  Text, 
+  StyleSheet, 
+  TouchableOpacity, 
+  ScrollView, 
+  Dimensions, 
+  FlatList, 
+  ActivityIndicator 
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons'; 
+import { getCurrentUser, fetchAnnouncements } from '../../lib/appwrite'; 
 
 export default function HomePage({ navigation }) {
-  const { height, width } = Dimensions.get('window'); // Get the window width for carousel
-  const carouselRef = useRef(null); // Ref for carousel
-  const [currentIndex, setCurrentIndex] = useState(0); // Track current index for carousel dots
+  const { height, width } = Dimensions.get('window'); 
+  const carouselRef = useRef(null); 
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [userName, setUserName] = useState(''); 
+  const [announcements, setAnnouncements] = useState([]); 
+  const [loading, setLoading] = useState(true); 
+  const [error, setError] = useState(null); 
 
-  const carouselItems = [
-    {
-      title: "Announcement 1",
-      description: "Exam schedule will be released soon.",
-    },
-    {
-      title: "Announcement 2",
-      description: "New courses available for next semester.",
-    },
-    {
-      title: "Announcement 3",
-      description: "Don't forget to submit your assignments!",
-    },
-  ];
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const user = await getCurrentUser();
+        if (user) {
+          setUserName(user.name); 
+        }
+
+        const allAnnouncements = await fetchAnnouncements(); 
+        const topThreeAnnouncements = allAnnouncements.slice(0, 3);
+        setAnnouncements(topThreeAnnouncements);
+      } catch (err) {
+        console.error('Error fetching data:', err);
+        setError(err.message || 'An error occurred');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []); 
 
   const renderCarouselItem = ({ item, index }) => (
-    <View style={[styles.carouselItem, { width: width * 0.85 }]}>
+    <View key={item.$id} style={[styles.carouselItem, { width: width * 0.85 }]}>
       <Text style={styles.carouselTitle}>{item.title}</Text>
       <Text style={styles.carouselDescription}>{item.description}</Text>
     </View>
@@ -34,6 +56,23 @@ export default function HomePage({ navigation }) {
     setCurrentIndex(index);
   };
 
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#1b4769" />
+      </View>
+    );
+  }
+
+  if (error) {
+
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorText}>Error: {error}</Text>
+      </View>
+    );
+  }
+
   return (
     <ScrollView style={styles.container}>
       {/* Background Shape */}
@@ -41,27 +80,31 @@ export default function HomePage({ navigation }) {
 
       {/* Welcome Heading */}
       <Text style={styles.welcomeText}>Welcome,</Text>
-      <Text style={styles.welcomeTextt}>Bhagyasree!</Text>
+      <Text style={styles.welcomeTextt}>{userName ? userName : 'Student'}!</Text> 
 
       {/* Carousel */}
       <View style={styles.carouselContainer}>
-        <FlatList
-          data={carouselItems}
-          keyExtractor={(item, index) => index.toString()}
-          renderItem={renderCarouselItem}
-          horizontal
-          pagingEnabled
-          showsHorizontalScrollIndicator={false}
-          onScroll={handleScroll}
-          ref={carouselRef}
-          snapToAlignment="center"
-          decelerationRate="fast"
-        />
+        {announcements.length > 0 ? (
+          <FlatList
+            data={announcements}
+            keyExtractor={(item) => item.$id} 
+            renderItem={renderCarouselItem}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            onScroll={handleScroll}
+            ref={carouselRef}
+            snapToAlignment="center"
+            decelerationRate="fast"
+          />
+        ) : (
+          <Text style={styles.noAnnouncementsText}>No announcements available.</Text>
+        )}
       </View>
 
       {/* Carousel Dots */}
       <View style={styles.dotsContainer}>
-        {carouselItems.map((_, index) => (
+        {announcements.map((_, index) => (
           <View
             key={index}
             style={[
@@ -104,27 +147,45 @@ export default function HomePage({ navigation }) {
       </View>
 
       {/* Feature Cards */}
-      <View style={styles.cardsContainer}>
-        <TouchableOpacity 
-          style={styles.card} 
-          onPress={() => navigation.navigate('Announcements')} // Navigate to the Announcement screen
-        >
-          <Ionicons name="notifications-outline" size={24} color="#333" />
-          <Text style={styles.cardText}>Announcements</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.card}>
-          <Ionicons name="calendar-outline" size={24} color="#333" />
-          <Text style={styles.cardText}>My Calendar</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.card}>
-          <Ionicons name="book-outline" size={24} color="#333" />
-          <Text style={styles.cardText}>Assignments</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.card}>
-          <Ionicons name="checkbox-outline" size={24} color="#333" />
-          <Text style={styles.cardText}>Exams</Text>
-        </TouchableOpacity>
-      </View>
+        {/* Feature Cards */}
+        <View style={styles.cardsContainer}>
+          {/* Attendance Card */}
+          <TouchableOpacity 
+            style={styles.card} 
+            onPress={() => navigation.navigate('attendance')} // Navigate to the Attendance screen
+          >
+            <Ionicons name="clipboard-outline" size={24} color="#333" />
+            <Text style={styles.cardText}>Attendance</Text>
+          </TouchableOpacity>
+
+          {/* My Calendar Card */}
+          <TouchableOpacity 
+            style={styles.card} 
+            onPress={() => navigation.navigate('timetable')} // Navigate to the Timetable screen
+          >
+            <Ionicons name="calendar-outline" size={24} color="#333" />
+            <Text style={styles.cardText}>My Timetable</Text>
+          </TouchableOpacity>
+
+          {/* Student Support Card */}
+          <TouchableOpacity 
+            style={styles.card} 
+            onPress={() => navigation.navigate('support')}
+          >
+            <Ionicons name="help-circle-outline" size={24} color="#333" />
+            <Text style={styles.cardText}>Student Support</Text>
+          </TouchableOpacity>
+
+          {/* Marks Card */}
+          <TouchableOpacity 
+            style={styles.card} 
+            onPress={() => navigation.navigate('marks')} // Navigate to the Marks screen
+          >
+            <Ionicons name="checkbox-outline" size={24} color="#333" />
+            <Text style={styles.cardText}>Marks</Text>
+          </TouchableOpacity>
+        </View>
+
     </ScrollView>
   );
 }
@@ -138,6 +199,7 @@ const styles = StyleSheet.create({
   backgroundShape: {
     position: 'absolute',
     width: '100%',
+    marginTop:'2%',
     backgroundColor: '#1b4769', // Purple color similar to the image
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
@@ -151,10 +213,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 }, // Default shadow below
     shadowRadius: 10, // To make the shadow softer
     elevation: 5, // Optional for Android to provide more shadow effect
-    shadowTop: {
-      width: 0,
-      height: -10, // Negative height value to move shadow to the top
-    }
+    // Removed 'shadowTop' as it's not a valid style property
   },
   
   // Welcome Text
@@ -183,7 +242,7 @@ const styles = StyleSheet.create({
     elevation: 4, // For Android devices
     borderRadius: 15,
   },
-    
+  
   carouselItem: {
     backgroundColor: '#fff',
     borderRadius: 15, // More rounded corners for smoother shadow
@@ -194,8 +253,6 @@ const styles = StyleSheet.create({
     shadowRadius: 10, // Soften the shadow edges
     elevation: 8, // For 3D effect on Android
   },
-  
-  
   
   carouselTitle: {
     fontSize: 18,
@@ -289,9 +346,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'red',
     color: '#fff',
     paddingVertical: 3,
-    paddingHorizontal: 10,
+    paddingHorizontal: 12,
     borderRadius: 5,
     fontSize: 12,
+    marginLeft:3,
   },
   statusUpcoming: {
     backgroundColor: '#1b4769',
@@ -311,12 +369,6 @@ const styles = StyleSheet.create({
     paddingRight: '7.5%',
     marginTop: 30,
   },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-    color:'#F2F0EF'
-  },
   card: {
     backgroundColor: '#fff',
     width: '48%',
@@ -332,5 +384,27 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginTop: 10,
     color: '#333',
+  },
+  // Loading and Error Styles
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 16,
+  },
+  noAnnouncementsText: {
+    textAlign: 'center',
+    color: '#666',
+    marginTop: 20,
+    fontSize: 16,
   },
 });

@@ -1,6 +1,15 @@
 # CHRIST Student App
 The CHRIST Student App is a university student management application designed for the students of CHRIST (Deemed to be University). It provides a centralized platform for students to access academic and personal information like attendance, grades, timetables, and more. The app also includes sections for announcements, clubs, and university resources to enhance student engagement and streamline their academic journey.
 ## Screenshots
+### Home Page
+![Home Page](assets/Homescreen.jpeg)
+![Time-Table](assets/Timetable.jpeg)
+![Attendance](assets/Attendance.jpeg)
+![Faculty](assets/Faculty.jpeg)
+![Announcements](assets/Announcements.jpeg)
+![Profile](assets/Profile.jpeg)
+![Marks Card](assets/Markscard.jpeg)
+
 ## Features
 - **Attendance Tracker**: Visual analytics to track attendance by subject and overall performance.
 - **Marks Section**: Comprehensive display of Continuous Internal Assessment (CIA), mid-semester, and end-semester marks. Downloadable mark sheets.

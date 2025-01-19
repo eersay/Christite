@@ -83,7 +83,6 @@ const Forms = ({ registerNumber }) => {
               key={form.id} 
               style={[styles.formButton, isDarkMode ? styles.darkFormButton : styles.lightFormButton]} 
               onPress={() => handleFormSelection(form)} 
-              accessibilityLabel={`Download ${form.name}`} 
             >
               <Ionicons name={form.icon} size={24} color={isDarkMode ? '#fff' : '#1b4769'} />
               <Text style={[styles.buttonText, isDarkMode ? styles.darkText : styles.lightText]}>{form.name}</Text>
@@ -167,8 +166,5 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 });
-Forms.defaultProps = {
-  registerNumber: 'N/A', // Default value in case no register number is passed
-};
 
 export default Forms;
